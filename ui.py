@@ -60,6 +60,7 @@ class AppWin(object):
             car = CarRecorder(name, surname, phone,
                     email, plate, door, db_name)
             car.add_car(CAR_TABLE)
+        self.set_view_tab()
 
     def form_check(self, name, surname, door, plate):
         """checks whether enough data provided to record
@@ -122,12 +123,18 @@ class AppWin(object):
         car_info = viewer.get_table_info(CAR_TABLE)
         columns = conf.get_table_fields(CAR_TABLE)
         self.view_table.setColumnCount(len(columns))
+        self.view_table.setRowCount(len(car_info))
         col_str = ','.join(columns)
         print col_str
         self.view_table.setHorizontalHeaderLabels \
             (QtCore.QString(col_str).split(','))
         self.view_table.resize(600, 500)
         self.tabs.addTab(self.view_tab, "View Cars")
+        for i in range(0, len(car_info)):
+            print i
+            for idx, val in enumerate(columns):
+                self.view_table.setItem(i, idx, QtGui.QTableWidgetItem(
+                    car_info[i][val]))
 
 def main():
     """main function."""
