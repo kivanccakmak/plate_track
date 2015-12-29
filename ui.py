@@ -21,6 +21,8 @@ class AppWin(object):
         self.form_button = QtGui.QPushButton('Save', self.form_tab)
         self.form_warning = QtGui.QLabel('', self.form_tab)
         self.form_boxes = {}
+        self.view_tab = QtGui.QWidget()
+        self.view_table = QtGui.QTableWidget(self.view_tab)
         self.set_form_tab()
         self.set_view_tab()
 
@@ -58,6 +60,7 @@ class AppWin(object):
             car = CarRecorder(name, surname, phone,
                     email, plate, door, db_name)
             car.add_car(CAR_TABLE)
+        self.set_view_tab()
 
     def form_check(self, name, surname, door, plate):
         """checks whether enough data provided to record
@@ -109,16 +112,29 @@ class AppWin(object):
         self.form_boxes[box_name].move(x_pos+dist, y_pos)
         layout.addWidget(self.form_boxes[box_name])
 
-    # @pyqtSlot
-    def save_click(self):
-        print self.form_layout.text('name')
-
     def set_view_tab(self):
         """sets view tab, which would be used to
         view database and delete records from database.
         """
-        view_tab = QtGui.QWidget()
-        self.tabs.addTab(view_tab, "View Cars")
+        conf = Fconfig(CONFIG_FILE)
+        db_name = conf.get_db_name()
+        viewer = CarRecorder(name=None, surname=None, phone=None,
+                email=None, plate=None, door=None, db_name=db_name)
+        car_info = viewer.get_table_info(CAR_TABLE)
+        columns = conf.get_table_fields(CAR_TABLE)
+        self.view_table.setColumnCount(len(columns))
+        self.view_table.setRowCount(len(car_info))
+        col_str = ','.join(columns)
+        print col_str
+        self.view_table.setHorizontalHeaderLabels \
+            (QtCore.QString(col_str).split(','))
+        self.view_table.resize(600, 500)
+        self.tabs.addTab(self.view_tab, "View Cars")
+        for i in range(0, len(car_info)):
+            print i
+            for idx, val in enumerate(columns):
+                self.view_table.setItem(i, idx, QtGui.QTableWidgetItem(
+                    car_info[i][val]))
 
 def main():
     """main function."""

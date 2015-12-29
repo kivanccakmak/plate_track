@@ -27,6 +27,7 @@ class CarRecorder(object):
         self.info['plate'] = plate
         self.info['door'] = door
         self._conn = sqlite3.connect(db_name)
+        self._conn.row_factory = sqlite3.Row
         self._cursor = self._conn.cursor()
 
     def add_car(self, table_name):
@@ -47,6 +48,21 @@ class CarRecorder(object):
         print query
         self._cursor.execute(query)
         self._conn.commit()
+
+    def get_table_info(self, table_name):
+        """returns table info in raw factory.
+        :table_name: string
+        :returns: sqlite3.Row object
+            contains array of dict which represents
+            all entries in table
+        """
+        query = 'SELECT * FROM [{tbl}]'.format(
+                tbl=table_name)
+        self._cursor.execute(query)
+        rows = self._cursor.fetchall()
+        return rows
+
+
 
 
 
