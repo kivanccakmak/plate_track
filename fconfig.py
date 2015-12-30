@@ -20,6 +20,20 @@ def parse_dict(str_val):
         elem_list[key] = val
     return elem_list
 
+def parse_dict_arr(str_val):
+    """Parses dict array string from .ini file.
+
+    :str_val: string
+        '{'key1':'val1'}\n{'key2':'val2'}'
+    :returns: dictionary array
+        [{'key1':'val1'}, {'key2':'val2'}]
+    """
+    elem_arr = []
+    elements = str_val.split()
+    for elem in elements:
+        elem_arr.append(ast.literal_eval(elem))
+    return elem_arr
+
 class Fconfig(object):
 
     """Docstring for Fconfig. """

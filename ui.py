@@ -3,22 +3,29 @@ from PyQt4 import QtCore
 from PyQt4.QtCore import pyqtSlot
 from car_recorder import CarRecorder
 from fconfig import Fconfig
+from fconfig import parse_dict 
+from fconfig import parse_dict_arr
 from plate_reader import PlateRead
 import sys
 import os
+import ast
 
 CONFIG_FILE = 'config.ini'
-STYLE_FILE = 'style.ini'
 CAR_TABLE = 'car_info'
 
 class AppWin(object):
     """Application UI Class."""
     def __init__(self):
         """init function."""
+        self.style_conf = Fconfig(CONFIG_FILE)
+        max_x = int(self.style_conf.get_config('tabs')['max_x'])
+        max_y = int(self.style_conf.get_config('tabs')['max_y'])
+        title = self.style_conf.get_config('tabs')['title']
+
         self.app = QtGui.QApplication(sys.argv)
         self.tabs = QtGui.QTabWidget()
-        self.tabs.setWindowTitle('Garage App')
-        self.tabs.setMinimumSize(625, 600)
+        self.tabs.setWindowTitle(title)
+        self.tabs.setMinimumSize(max_x, max_y)
 
         # initialize form tab and its items
         self.form_tab = QtGui.QWidget()
@@ -48,26 +55,29 @@ class AppWin(object):
         """sets input form which would be used to
         enter new car into database.
         """
-        conf = Fconfig(STYLE_FILE)
-        elements = conf.get_config('form')['elements'].split()
-        x_pos = int(conf.get_config('form')['elem_x_init'])
-        y_pos = int(conf.get_config('form')['elem_y_init'])
-        space = int(conf.get_config('form')['elem_dist'])
-        y_incr = int(conf.get_config('form')['y_dist'])
-        warn_x_pos = int(conf.get_config('form')['warning_x'])
-        warn_y_pos = int(conf.get_config('form')['warning_y'])
-        btn_x_pos = int(conf.get_config('form')['button_x'])
-        btn_y_pos = int(conf.get_config('form')['button_y'])
+        elements = self.style_conf.get_config('form')['elements']
+        x_pos = int(self.style_conf.get_config('form')['elem_x_init'])
+        y_pos = int(self.style_conf.get_config('form')['elem_y_init'])
+        space = int(self.style_conf.get_config('form')['elem_dist'])
+        y_incr = int(self.style_conf.get_config('form')['y_dist'])
+        warn_x_pos = int(self.style_conf.get_config('form')['warning_x'])
+        warn_y_pos = int(self.style_conf.get_config('form')['warning_y'])
+        btn_x_pos = int(self.style_conf.get_config('form')['button_x'])
+        btn_y_pos = int(self.style_conf.get_config('form')['button_y'])
 
-        for elem in elements:
-            self.add_form_input(self.form_layout, elem, elem.lower(),
+        elem_list = parse_dict_arr(elements)
+
+        for elem in elem_list:
+            key = elem.keys()[0]
+            val = elem.values()[0]
+            self.add_form_input(self.form_layout, val, key,
                     x_pos, y_pos, space)
             y_pos += y_incr
 
         self.form_warning.move(warn_x_pos, warn_y_pos)
         self.form_button.move(btn_x_pos, btn_y_pos)
-        self.form_button.connect(self.form_button, QtCore.SIGNAL('clicked()'),
-                self.form_btn_click)
+        self.form_button.connect(self.form_button,
+                QtCore.SIGNAL('clicked()'), self.form_btn_click)
         self.form_tab.setLayout(self.form_layout)
         self.tabs.addTab(self.form_tab, "New Car")
 
@@ -98,73 +108,66 @@ class AppWin(object):
         self.process_label.setPixmap(pixmap)
 
     def read_plate(self):
+        """ reads plate and returns result to content
+        """
         plate = PlateRead(self.plate_img_path)
         self.process_content.setText('')
-        succ_str = 'name: {name}, surname: {surname}, plate: {plate}'
         status, result = plate.plate_check()
-        print status
-        print result
         if status:
-            name = result[0]['name']
-            surname = result[0]['surname']
-            plate = result[0]['plate']
-            succ_str = succ_str.format(name=name,
-                    surname=surname, plate=plate)
             self.process_content.insertPlainText('Citizen\n')
-            self.process_content.insertPlainText(succ_str)
+            self.print_dict_res(result[0])
         else:
             if str(result['plate']) == 'NoN':
                 self.process_content.insertPlainText('Read Failed')
             else:
                 self.process_content.insertPlainText('Not in Garage\n')
-                self.process_content.insertPlainText('Plate:'
-                    + ' ' + result['plate'] + '\n')
-                self.process_content.insertPlainText('Conf: '
-                    + ' ' + result['conf'])
+                self.print_dict_res(result)
+
+    def print_dict_res(self, dict_res):
+        """ prints output in a key: val format to content
+        :dict_res: dictionary
+        """
+        msg = '{key}: {val}'
+        msg_val = ''
+        for key in dict_res.keys():
+            msg_val = msg.format(key=key,
+                    val=dict_res[key])
+            msg_val += '\n'
+            self.process_content.insertPlainText(msg_val)
+
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
         plate number is provided; adds car into database
         """
-        name = self.form_boxes['name'].text()
-        surname = self.form_boxes['surname'].text()
-        phone = self.form_boxes['phone'].text()
-        email = self.form_boxes['email'].text()
-        door = self.form_boxes['door'].text()
-        plate = self.form_boxes['plate'].text()
-        result = self.form_check(name, surname, door, plate)
+        elem_list = {}
+        keys = self.form_boxes.keys()
+        for key in keys:
+            elem_list[key] = self.form_boxes[key].text()
+        result = self.form_check(elem_list)
         if result == True:
             conf = Fconfig(CONFIG_FILE)
             db_name = conf.get_db_name()
-            car = CarRecorder(name, surname, phone,
-                    email, plate, door, db_name)
+            car = CarRecorder(elem_list, db_name)
             car.add_car(CAR_TABLE)
         self.set_view_tab()
 
-    def form_check(self, name, surname, door, plate):
+    def form_check(self, elem_list):
         """checks whether enough data provided to record
         car into database.
-        :name: string
-        :surname: string
-        :door: string
-            door number of car owner
-        :plate: string
-            plate of car
+        :elem_list: dict
+            collected from form boxes
+        :return: bool
+            if all filled True, otherwise False
         """
+        warn_str = 'Enter {field}'
         self.form_warning.setText('')
-        if name.isEmpty():
-            print 'name empty'
-            self.form_warning.setText('Enter Name')
-            return False
-        if surname.isEmpty():
-            self.form_warning.setText('Enter Surname')
-            return False
-        if door.isEmpty():
-            self.form_warning.setText('Enter Door No')
-            return False
-        if plate.isEmpty():
-            self.form_warning.setText('Enter Plate')
-            return False
+        for key in elem_list.keys():
+            val = elem_list[key]
+            if val.isEmpty():
+                warn_str = warn_str.format(field=key)
+                self.form_warning.setText(warn_str)
+                return False
         return True
 
     def add_form_input(self, layout, lbl_str, box_name,
@@ -197,8 +200,7 @@ class AppWin(object):
         """
         conf = Fconfig(CONFIG_FILE)
         db_name = conf.get_db_name()
-        viewer = CarRecorder(name=None, surname=None, phone=None,
-                email=None, plate=None, door=None, db_name=db_name)
+        viewer = CarRecorder(credentials={}, db_name=db_name)
         car_info = viewer.get_table_info(CAR_TABLE)
         print car_info
         columns = conf.get_table_fields(CAR_TABLE)
