@@ -2,6 +2,14 @@ from car_recorder import CarRecorder
 from fconfig import Fconfig
 
 CONFIG_FILE = "config.ini"
+TABLE_NAME = 'car_info'
+CREDENTIALS = {}
+CREDENTIALS['name'] = 'Osman'
+CREDENTIALS['surname'] = 'Osman'
+CREDENTIALS['phone'] = '123'
+CREDENTIALS['plate'] = '34OSM34'
+CREDENTIALS['door'] = 'X10'
+CREDENTIALS['email'] = 'osman@osman.com'
 
 def main():
     """runs unit test procedure.
@@ -17,31 +25,15 @@ def add_test(db_name):
     """adds car into database.
     :db_name: String
     """
-    table_name = "car_info"
-    name = "Ahmet"
-    surname = "Cakmak"
-    phone = "02163508667"
-    email = "ahmet@cakmak.com"
-    plate = "34AHM34"
-    door = "X10"
-    car = CarRecorder(name, surname, phone,
-            email, plate, door, db_name)
-    car.add_car(table_name)
+    car = CarRecorder(CREDENTIALS, db_name)
+    car.add_car(TABLE_NAME)
 
 def del_test(db_name):
     """adds person to cars database.
     :db_name: String
     """
-    table_name = "car_info"
-    name = "Ahmet"
-    surname = "Cakmak"
-    phone = "02163508667"
-    email = "ahmet@cakmak.com"
-    plate = "34AHM34"
-    door = "X10"
-    car = CarRecorder(name, surname, phone,
-            email, plate, door, db_name)
-    car.del_car(table_name)
+    car = CarRecorder(CREDENTIALS, db_name)
+    car.del_car(TABLE_NAME)
 
 if __name__ == "__main__":
     main()
