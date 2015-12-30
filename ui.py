@@ -114,8 +114,10 @@ class AppWin(object):
         self.process_content.setText('')
         status, result = plate.plate_check()
         if status:
+            self.process_content.setStyleSheet("QTextEdit {color:green}")
             self.print_dict_res(result)
         else:
+            self.process_content.setStyleSheet("QTextEdit {color:red}")
             if str(result['plate']) == 'NoN':
                 self.process_content.insertPlainText('Read Failed')
             else:
