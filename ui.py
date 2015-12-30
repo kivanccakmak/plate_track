@@ -70,7 +70,9 @@ class AppWin(object):
     def getfile(self):
         fname = QtGui.QFileDialog.getOpenFileName(None, 'Open File',
                 '/', 'Image Files (*.jpg *.png)')
-        self.process_label.setPixmap(QtGui.QPixmap(fname))
+        pixmap = QtGui.QPixmap(fname)
+        pixmap = pixmap.scaled(625, 500)
+        self.process_label.setPixmap(pixmap)
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
