@@ -8,6 +8,7 @@ import sys
 import os
 
 CONFIG_FILE = 'config.ini'
+STYLE_FILE = 'style.ini'
 CAR_TABLE = 'car_info'
 
 class AppWin(object):
@@ -47,14 +48,24 @@ class AppWin(object):
         """sets input form which would be used to
         enter new car into database.
         """
-        self.add_form_input(self.form_layout, 'Name', 'name', 10, 10, 200)
-        self.add_form_input(self.form_layout, 'Surname', 'surname', 10, 60, 200)
-        self.add_form_input(self.form_layout, 'Phone', 'phone', 10, 110, 200)
-        self.add_form_input(self.form_layout, 'E-mail', 'email', 10, 160, 200)
-        self.add_form_input(self.form_layout, 'Door', 'door', 10, 210, 200)
-        self.add_form_input(self.form_layout, 'Plate', 'plate', 10, 260, 200)
-        self.form_warning.move(14, 330)
-        self.form_button.move(485, 350)
+        conf = Fconfig(STYLE_FILE)
+        elements = conf.get_config('form')['elements'].split()
+        x_pos = int(conf.get_config('form')['elem_x_init'])
+        y_pos = int(conf.get_config('form')['elem_y_init'])
+        space = int(conf.get_config('form')['elem_dist'])
+        y_incr = int(conf.get_config('form')['y_dist'])
+        warn_x_pos = int(conf.get_config('form')['warning_x'])
+        warn_y_pos = int(conf.get_config('form')['warning_y'])
+        btn_x_pos = int(conf.get_config('form')['button_x'])
+        btn_y_pos = int(conf.get_config('form')['button_y'])
+
+        for elem in elements:
+            self.add_form_input(self.form_layout, elem, elem.lower(),
+                    x_pos, y_pos, space)
+            y_pos += y_incr
+
+        self.form_warning.move(warn_x_pos, warn_y_pos)
+        self.form_button.move(btn_x_pos, btn_y_pos)
         self.form_button.connect(self.form_button, QtCore.SIGNAL('clicked()'),
                 self.form_btn_click)
         self.form_tab.setLayout(self.form_layout)
