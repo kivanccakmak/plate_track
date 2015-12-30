@@ -35,19 +35,14 @@ def tr_plate_check(plate):
     i = 2
     str_end = -1
     while i < len(plate) and str_end == -1:
-        print "i: {}".format(i)
-        print "plate[i]: {}".format(str(plate[i]))
         try:
             val = int(str(plate[i]))
-            print "val: {}".format(val)
             str_end = i
         except ValueError:
-            print "value error"
+            pass
         i += 1
 
-    print "str_end: {}".format(str_end)
     for i in range(str_end, len(plate)):
-        print "i: {}".format(i)
         if plate[i] == 'O':
             plate[i] = '0'
         else:
@@ -118,7 +113,7 @@ class PlateRead(object):
             else:
                 rows = []
             if len(rows) != 0:
-                result_info = rows
+                result_info = rows[0]
                 return True, result_info
         result_info = result[0]
         return False, result_info

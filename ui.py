@@ -17,10 +17,10 @@ class AppWin(object):
     """Application UI Class."""
     def __init__(self):
         """init function."""
-        self.style_conf = Fconfig(CONFIG_FILE)
-        max_x = int(self.style_conf.get_config('tabs')['max_x'])
-        max_y = int(self.style_conf.get_config('tabs')['max_y'])
-        title = self.style_conf.get_config('tabs')['title']
+        self.conf = Fconfig(CONFIG_FILE)
+        max_x = int(self.conf.get_config('tabs')['max_x'])
+        max_y = int(self.conf.get_config('tabs')['max_y'])
+        title = self.conf.get_config('tabs')['title']
 
         self.app = QtGui.QApplication(sys.argv)
         self.tabs = QtGui.QTabWidget()
@@ -55,23 +55,21 @@ class AppWin(object):
         """sets input form which would be used to
         enter new car into database.
         """
-        elements = self.style_conf.get_config('form')['elements']
-        x_pos = int(self.style_conf.get_config('form')['elem_x_init'])
-        y_pos = int(self.style_conf.get_config('form')['elem_y_init'])
-        space = int(self.style_conf.get_config('form')['elem_dist'])
-        y_incr = int(self.style_conf.get_config('form')['y_dist'])
-        warn_x_pos = int(self.style_conf.get_config('form')['warning_x'])
-        warn_y_pos = int(self.style_conf.get_config('form')['warning_y'])
-        btn_x_pos = int(self.style_conf.get_config('form')['button_x'])
-        btn_y_pos = int(self.style_conf.get_config('form')['button_y'])
+        elements = self.conf.get_config('form')['elements']
+        x_pos = int(self.conf.get_config('form')['elem_x_init'])
+        y_pos = int(self.conf.get_config('form')['elem_y_init'])
+        y_incr = int(self.conf.get_config('form')['y_dist'])
+        warn_x_pos = int(self.conf.get_config('form')['warning_x'])
+        warn_y_pos = int(self.conf.get_config('form')['warning_y'])
+        btn_x_pos = int(self.conf.get_config('form')['button_x'])
+        btn_y_pos = int(self.conf.get_config('form')['button_y'])
 
         elem_list = parse_dict_arr(elements)
 
         for elem in elem_list:
             key = elem.keys()[0]
             val = elem.values()[0]
-            self.add_form_input(self.form_layout, val, key,
-                    x_pos, y_pos, space)
+            self.add_form_input(val, key, x_pos, y_pos)
             y_pos += y_incr
 
         self.form_warning.move(warn_x_pos, warn_y_pos)
@@ -85,10 +83,12 @@ class AppWin(object):
         """sets image processing tab. image would be chosen by document
         window, then openalpr would be run
         """
+        max_x = int(self.conf.get_config('process')['content_max_x'])
+        max_y = int(self.conf.get_config('process')['content_max_y'])
         self.process_layout.addWidget(self.process_label)
         self.process_layout.addWidget(self.process_btn)
         self.process_layout.addWidget(self.fopen_btn)
-        self.process_content.setMaximumSize(625, 50)
+        self.process_content.setMaximumSize(max_x, max_y)
         self.process_content.setReadOnly(True)
         self.process_layout.addWidget(self.process_content)
         self.process_tab.setLayout(self.process_layout)
@@ -114,8 +114,7 @@ class AppWin(object):
         self.process_content.setText('')
         status, result = plate.plate_check()
         if status:
-            self.process_content.insertPlainText('Citizen\n')
-            self.print_dict_res(result[0])
+            self.print_dict_res(result)
         else:
             if str(result['plate']) == 'NoN':
                 self.process_content.insertPlainText('Read Failed')
@@ -170,11 +169,8 @@ class AppWin(object):
                 return False
         return True
 
-    def add_form_input(self, layout, lbl_str, box_name,
-            x_pos, y_pos, dist):
+    def add_form_input(self, lbl_str, box_name, x_pos, y_pos):
         """adds label-textbox into widget.
-        :layout: QtGui.QVBoxLayout
-            layout to add
         :box_name: string
             object name of textbox
         :lbl_str: string
@@ -184,32 +180,33 @@ class AppWin(object):
             x position
         :y_pos: int
             y position
-        :dist: int
-            distance in between label and input textbox
         """
         label = QtGui.QLabel(lbl_str)
         label.move(x_pos, y_pos)
-        layout.addWidget(label)
+        self.form_layout.addWidget(label)
+        self.form_layout.addWidget(label)
         self.form_boxes[box_name] = QtGui.QLineEdit()
-        self.form_boxes[box_name].move(x_pos+dist, y_pos)
-        layout.addWidget(self.form_boxes[box_name])
+        self.form_boxes[box_name].move(x_pos, y_pos)
+        self.form_layout.addWidget(self.form_boxes[box_name])
 
     def set_view_tab(self):
         """sets view tab, which would be used to
         view database and delete records from database.
         """
-        conf = Fconfig(CONFIG_FILE)
-        db_name = conf.get_db_name()
+        x_size = \
+            int(self.conf.get_config('view')['table_size_x'])
+        y_size = \
+            int(self.conf.get_config('view')['table_size_y'])
+        db_name = self.conf.get_db_name()
         viewer = CarRecorder(credentials={}, db_name=db_name)
         car_info = viewer.get_table_info(CAR_TABLE)
-        print car_info
-        columns = conf.get_table_fields(CAR_TABLE)
+        columns = self.conf.get_table_fields(CAR_TABLE)
         self.view_table.setColumnCount(len(columns))
         self.view_table.setRowCount(len(car_info))
         col_str = ','.join(columns)
         self.view_table.setHorizontalHeaderLabels \
             (QtCore.QString(col_str).split(','))
-        self.view_table.resize(700, 600)
+        self.view_table.resize(x_size, y_size)
         self.tabs.addTab(self.view_tab, "View Cars")
         for i in range(0, len(car_info)):
             for idx, val in enumerate(columns):
