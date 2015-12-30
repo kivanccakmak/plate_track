@@ -17,7 +17,7 @@ class AppWin(object):
         self.app = QtGui.QApplication(sys.argv)
         self.tabs = QtGui.QTabWidget()
         self.tabs.setWindowTitle('Garage App')
-        self.tabs.setMinimumSize(625, 500)
+        self.tabs.setMinimumSize(625, 600)
 
         # initialize form tab and its items
         self.form_tab = QtGui.QWidget()
@@ -39,6 +39,7 @@ class AppWin(object):
         self.process_label = QtGui.QLabel()
         self.fopen_btn = QtGui.QPushButton('Open File')
         self.file_dialog = QtGui.QFileDialog()
+        self.process_content = QtGui.QTextEdit()
         self.plate_img_path = ''
         self.set_process_tab()
 
@@ -66,6 +67,9 @@ class AppWin(object):
         self.process_layout.addWidget(self.process_label)
         self.process_layout.addWidget(self.process_btn)
         self.process_layout.addWidget(self.fopen_btn)
+        self.process_content.setMaximumSize(625, 50)
+        self.process_content.setReadOnly(True)
+        self.process_layout.addWidget(self.process_content)
         self.process_tab.setLayout(self.process_layout)
         self.fopen_btn.clicked.connect(self.getfile)
         self.process_btn.clicked.connect(self.read_plate)
@@ -85,6 +89,7 @@ class AppWin(object):
     def read_plate(self):
         plate = PlateRead(self.plate_img_path)
         result = plate.openalpr_run()
+        self.process_content.setText(str(result))
         print result
 
     def form_btn_click(self):
