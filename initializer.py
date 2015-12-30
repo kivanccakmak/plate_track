@@ -13,9 +13,9 @@ class Initialize:
         to config.ini
         """
         conf = Fconfig(fname)
-
-        table_list = conf.get_table_list()
-        db_name = conf.get_db_name()
+        table_list = conf.get_config('tables')['name'].split()
+        db_name = \
+            conf.get_config('database')['name'].split()[0]
 
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
@@ -24,9 +24,7 @@ class Initialize:
             fields = conf.get_table_fields(table)
             query = Query.get_create_qry(table, fields)
             cursor.execute(query)
-
         conn.close()
-
 
 def main():
     """creates database with tables

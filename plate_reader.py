@@ -1,5 +1,6 @@
 import subprocess
 from car_recorder import CarRecorder
+from fconfig import Fconfig
 
 ALPR_INDEX = {}
 ALPR_INDEX['plate'] = 1
@@ -7,6 +8,7 @@ ALPR_INDEX['confidence'] = -1
 
 FILE_PATH = '/home/kivi/Downloads/plaka.jpg'
 CMD = 'alpr -c eu {plate_img}'
+CONFIG_FILE = 'config.ini'
 
 def tr_plate_check(plate):
     """Turkey's plate number in format of.
@@ -33,19 +35,14 @@ def tr_plate_check(plate):
     i = 2
     str_end = -1
     while i < len(plate) and str_end == -1:
-        print "i: {}".format(i)
-        print "plate[i]: {}".format(str(plate[i]))
         try:
             val = int(str(plate[i]))
-            print "val: {}".format(val)
             str_end = i
         except ValueError:
-            print "value error"
+            pass
         i += 1
 
-    print "str_end: {}".format(str_end)
     for i in range(str_end, len(plate)):
-        print "i: {}".format(i)
         if plate[i] == 'O':
             plate[i] = '0'
         else:
@@ -60,8 +57,9 @@ def db_check(plate):
     :plate: string
         plate number
     """
-    records = CarRecorder(None, None, None, 
-            None, None, None, 'data/garage.sqlite')
+    conf = Fconfig(CONFIG_FILE)
+    db_name = conf.get_db_name()
+    records = CarRecorder({}, db_name)
     rows = records.get_plate_records(plate, 'car_info')
     return rows
 
@@ -114,10 +112,8 @@ class PlateRead(object):
                 rows = db_check(plate)
             else:
                 rows = []
-            print "check_plate: {}".format(str(val['plate']))
-            print "len(rows): {}".format(len(rows))
             if len(rows) != 0:
-                result_info = rows
+                result_info = rows[0]
                 return True, result_info
         result_info = result[0]
         return False, result_info

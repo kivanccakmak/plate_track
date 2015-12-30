@@ -9,23 +9,16 @@ class CarRecorder(object):
 
     """Sets and Gets car information in database"""
 
-    def __init__(self, name, surname, phone, 
-            email, plate, door, db_name):
+    def __init__(self, credentials, db_name):
         """initiate car object which has contact info
-        :name: string
-        :surname: string
-        :email: string
-        :phone: string
-        :plate: string
-        :door: string
+        :credentials: dict
+            contains meta-data from form input
+        :db_name: str
+            relative path of database
         """
         self.info = {}
-        self.info['name'] = name
-        self.info['surname'] = surname
-        self.info['email'] = email
-        self.info['phone'] = phone
-        self.info['plate'] = plate
-        self.info['door'] = door
+        for key in credentials.keys():
+            self.info[key] = credentials[key]
         self._conn = sqlite3.connect(db_name)
         self._conn.row_factory = sqlite3.Row
         self._cursor = self._conn.cursor()
@@ -43,7 +36,7 @@ class CarRecorder(object):
         """Deletes car entry from database by using plate.
         :table_name: string
         """
-        info = {'plate':self.info['plate']}
+        info = {'plate':self.info['plate']} # hard-coded
         query = Query.get_delete_qry(info, table_name)
         print query
         self._cursor.execute(query)
@@ -73,14 +66,9 @@ class CarRecorder(object):
             car relevant information in database
         """
         query = 'SELECT * FROM [{tbl}] WHERE' + ' ' +\
-                '"plate"="{str}"'
+                '"plate"="{str}"' # hard-coded
         query = query.format(tbl=table_name, str=plate)
         self._cursor.execute(query)
         rows = self._cursor.fetchall()
         return rows
-
-
-
-
-
 

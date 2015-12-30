@@ -1,5 +1,38 @@
 import ConfigParser
 import collections
+import ast
+
+def parse_dict(str_val):
+    """Parses dict string from .ini file.
+
+    :str_val: string
+        '{'key1':'val1'}\n{'key2':'val2'}'
+    :returns: dictionary
+        {'key1':'val1', 'key2':'val2'}
+    """
+    elem_list = {}
+    current = {}
+    elements = str_val.split()
+    for elem in elements:
+        current = ast.literal_eval(elem)
+        key = current.keys()[0]
+        val = current.values()[0]
+        elem_list[key] = val
+    return elem_list
+
+def parse_dict_arr(str_val):
+    """Parses dict array string from .ini file.
+
+    :str_val: string
+        '{'key1':'val1'}\n{'key2':'val2'}'
+    :returns: dictionary array
+        [{'key1':'val1'}, {'key2':'val2'}]
+    """
+    elem_arr = []
+    elements = str_val.split()
+    for elem in elements:
+        elem_arr.append(ast.literal_eval(elem))
+    return elem_arr
 
 class Fconfig(object):
 
@@ -32,9 +65,11 @@ class Fconfig(object):
         :table: string
         :returns: string array
         """
-        field_info = self.get_config('fields')
-        fields = field_info[table].split()
-        return fields
+        field_map = self.get_config('field_map')[table]
+        field_map = field_map.split(',')
+        field_info = self.get_config(field_map[0])[field_map[1]]
+        field_info = parse_dict(field_info).keys()
+        return field_info
 
     def get_db_name(self):
         """get relative path of database
@@ -43,12 +78,4 @@ class Fconfig(object):
         db_info = self.get_config('database')
         db_name = db_info['name']
         return db_name
-
-    def get_table_list(self):
-        """get table list in database.
-        :returns: string array
-        """
-        table_info = self.get_config('tables')
-        table_list = table_info['name'].split()
-        return table_list
 
