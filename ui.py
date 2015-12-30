@@ -3,6 +3,7 @@ from PyQt4 import QtCore
 from PyQt4.QtCore import pyqtSlot
 from car_recorder import CarRecorder
 from fconfig import Fconfig
+from plate_reader import PlateRead
 import sys
 import os
 
@@ -82,8 +83,9 @@ class AppWin(object):
         self.process_label.setPixmap(pixmap)
 
     def read_plate(self):
-        print "in read_plate()"
-        print "file: {}".format(self.plate_img_path)
+        plate = PlateRead(self.plate_img_path)
+        result = plate.openalpr_run()
+        print result
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
