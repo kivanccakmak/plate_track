@@ -6,8 +6,11 @@ open door.
 
 Currently, offline plate recording is done. 
 
+<br>
 **_sqlite3_** used to create database.
+<br>
 **_pyqt_** used to introduce UI, which enables usage.
+<br>
 **_openalpr_** is used to recognize cars.
 
 
