@@ -88,9 +88,28 @@ class AppWin(object):
 
     def read_plate(self):
         plate = PlateRead(self.plate_img_path)
-        result = plate.openalpr_run()
-        self.process_content.setText(str(result))
+        self.process_content.setText('')
+        succ_str = 'name: {name}, surname: {surname}, plate: {plate}'
+        status, result = plate.plate_check()
+        print status
         print result
+        if status:
+            name = result[0]['name']
+            surname = result[0]['surname']
+            plate = result[0]['plate']
+            succ_str = succ_str.format(name=name,
+                    surname=surname, plate=plate)
+            self.process_content.insertPlainText('Citizen\n')
+            self.process_content.insertPlainText(succ_str)
+        else:
+            if str(result['plate']) == 'NoN':
+                self.process_content.insertPlainText('Read Failed')
+            else:
+                self.process_content.insertPlainText('Not in Garage\n')
+                self.process_content.insertPlainText('Plate:'
+                    + ' ' + result['plate'] + '\n')
+                self.process_content.insertPlainText('Conf: '
+                    + ' ' + result['conf'])
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
@@ -170,6 +189,7 @@ class AppWin(object):
         viewer = CarRecorder(name=None, surname=None, phone=None,
                 email=None, plate=None, door=None, db_name=db_name)
         car_info = viewer.get_table_info(CAR_TABLE)
+        print car_info
         columns = conf.get_table_fields(CAR_TABLE)
         self.view_table.setColumnCount(len(columns))
         self.view_table.setRowCount(len(car_info))
