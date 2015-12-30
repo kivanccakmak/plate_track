@@ -37,6 +37,8 @@ class AppWin(object):
         self.process_btn = QtGui.QPushButton('Recognize Plate')
         self.process_label = QtGui.QLabel()
         self.fopen_btn = QtGui.QPushButton('Open File')
+        self.file_dialog = QtGui.QFileDialog()
+        self.plate_img_path = ''
         self.set_process_tab()
 
     def set_form_tab(self):
@@ -65,14 +67,23 @@ class AppWin(object):
         self.process_layout.addWidget(self.fopen_btn)
         self.process_tab.setLayout(self.process_layout)
         self.fopen_btn.clicked.connect(self.getfile)
+        self.process_btn.clicked.connect(self.read_plate)
         self.tabs.addTab(self.process_tab, "Process Cars")
 
     def getfile(self):
-        fname = QtGui.QFileDialog.getOpenFileName(None, 'Open File',
+        """ opens file browser and pixmap. on process button click,
+        trigs plate reading.
+        """
+        fname = self.file_dialog.getOpenFileName(None, 'Open File',
                 '/', 'Image Files (*.jpg *.png)')
+        self.plate_img_path = str(fname)
         pixmap = QtGui.QPixmap(fname)
         pixmap = pixmap.scaled(625, 500)
         self.process_label.setPixmap(pixmap)
+
+    def read_plate(self):
+        print "in read_plate()"
+        print "file: {}".format(self.plate_img_path)
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
