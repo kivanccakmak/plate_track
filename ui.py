@@ -15,16 +15,24 @@ class AppWin(object):
         self.app = QtGui.QApplication(sys.argv)
         self.tabs = QtGui.QTabWidget()
         self.tabs.setWindowTitle('Garage App')
-        self.tabs.setMinimumSize(600, 500)
+        self.tabs.setMinimumSize(625, 500)
+
+        # initialize form tab and its items
         self.form_tab = QtGui.QWidget()
         self.form_layout = QtGui.QFormLayout()
         self.form_button = QtGui.QPushButton('Save', self.form_tab)
         self.form_warning = QtGui.QLabel('', self.form_tab)
         self.form_boxes = {}
+
+        # initialize view tab and its items
         self.view_tab = QtGui.QWidget()
         self.view_table = QtGui.QTableWidget(self.view_tab)
         self.set_form_tab()
         self.set_view_tab()
+
+        # initialize process tab and its items
+        self.process_tab = QtGui.QWidget()
+        self.set_process_tab()
 
     def set_form_tab(self):
         """sets input form which would be used to
@@ -42,6 +50,25 @@ class AppWin(object):
                 self.form_btn_click)
         self.form_tab.setLayout(self.form_layout)
         self.tabs.addTab(self.form_tab, "New Car")
+
+    def set_process_tab(self):
+        """sets image processing tab. image would be chosen by document
+        window, then openalpr would be run
+        """
+        # self.filename = QtGui.QFileDialog.getOpenFileName(self.process_tab,
+                # 'Open File', '/')
+        # with open(filename, 'r') as f:
+            # print f.read()
+        mdiarea = QtGui.QMdiArea(self.process_tab)
+        mdiarea.resize(625, 500)
+        filename = QtGui.QFileDialog(mdiarea, 'Open File', '/')
+        filename.resize(625, 500)
+        filename.open(self.somefun)
+        mdiarea.addSubWindow(filename)
+        self.tabs.addTab(self.process_tab, "Process Cars")
+
+    def somefun(self):
+        print "somefun"
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
@@ -128,7 +155,7 @@ class AppWin(object):
         print col_str
         self.view_table.setHorizontalHeaderLabels \
             (QtCore.QString(col_str).split(','))
-        self.view_table.resize(600, 500)
+        self.view_table.resize(700, 600)
         self.tabs.addTab(self.view_tab, "View Cars")
         for i in range(0, len(car_info)):
             print i
