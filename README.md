@@ -14,24 +14,26 @@ Currently, offline plate recording is done.
 **_openalpr_** is used to recognize cars
 
 
-Dependencies:
+##Dependencies
 
 ```
 sudo apt-get install openalpr
 sudo apt-get install python-qt4
 ```
 
-Beneficial:
+##Usage
+
+```
+python ui.py
+```
+
+##Beneficial
 
 ```
 sudo apt-get install sqliteman
 ```
 
-Usage:
 
-```
-python ui.py
-```
 
 
 
