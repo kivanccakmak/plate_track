@@ -24,6 +24,7 @@ sudo apt-get install python-qt4
 ##Usage
 
 ```
+python initializer.py
 python ui.py
 ```
 
