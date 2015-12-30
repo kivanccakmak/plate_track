@@ -4,6 +4,7 @@ from PyQt4.QtCore import pyqtSlot
 from car_recorder import CarRecorder
 from fconfig import Fconfig
 import sys
+import os
 
 CONFIG_FILE = 'config.ini'
 CAR_TABLE = 'car_info'
@@ -32,6 +33,10 @@ class AppWin(object):
 
         # initialize process tab and its items
         self.process_tab = QtGui.QWidget()
+        self.process_layout = QtGui.QVBoxLayout()
+        self.process_btn = QtGui.QPushButton('Recognize Plate')
+        self.process_label = QtGui.QLabel()
+        self.fopen_btn = QtGui.QPushButton('Open File')
         self.set_process_tab()
 
     def set_form_tab(self):
@@ -55,20 +60,17 @@ class AppWin(object):
         """sets image processing tab. image would be chosen by document
         window, then openalpr would be run
         """
-        # self.filename = QtGui.QFileDialog.getOpenFileName(self.process_tab,
-                # 'Open File', '/')
-        # with open(filename, 'r') as f:
-            # print f.read()
-        mdiarea = QtGui.QMdiArea(self.process_tab)
-        mdiarea.resize(625, 500)
-        filename = QtGui.QFileDialog(mdiarea, 'Open File', '/')
-        filename.resize(625, 500)
-        filename.open(self.somefun)
-        mdiarea.addSubWindow(filename)
+        self.process_layout.addWidget(self.process_label)
+        self.process_layout.addWidget(self.process_btn)
+        self.process_layout.addWidget(self.fopen_btn)
+        self.process_tab.setLayout(self.process_layout)
+        self.fopen_btn.clicked.connect(self.getfile)
         self.tabs.addTab(self.process_tab, "Process Cars")
 
-    def somefun(self):
-        print "somefun"
+    def getfile(self):
+        fname = QtGui.QFileDialog.getOpenFileName(None, 'Open File',
+                '/', 'Image Files (*.jpg *.png)')
+        self.process_label.setPixmap(QtGui.QPixmap(fname))
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
@@ -152,13 +154,11 @@ class AppWin(object):
         self.view_table.setColumnCount(len(columns))
         self.view_table.setRowCount(len(car_info))
         col_str = ','.join(columns)
-        print col_str
         self.view_table.setHorizontalHeaderLabels \
             (QtCore.QString(col_str).split(','))
         self.view_table.resize(700, 600)
         self.tabs.addTab(self.view_tab, "View Cars")
         for i in range(0, len(car_info)):
-            print i
             for idx, val in enumerate(columns):
                 self.view_table.setItem(i, idx, QtGui.QTableWidgetItem(
                     car_info[i][val]))
