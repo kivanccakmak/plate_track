@@ -3,7 +3,9 @@ from PyQt4 import QtCore
 from PyQt4.QtCore import pyqtSlot
 from car_recorder import CarRecorder
 from fconfig import Fconfig
+from plate_reader import PlateRead
 import sys
+import os
 
 CONFIG_FILE = 'config.ini'
 CAR_TABLE = 'car_info'
@@ -15,16 +17,31 @@ class AppWin(object):
         self.app = QtGui.QApplication(sys.argv)
         self.tabs = QtGui.QTabWidget()
         self.tabs.setWindowTitle('Garage App')
-        self.tabs.setMinimumSize(600, 500)
+        self.tabs.setMinimumSize(625, 600)
+
+        # initialize form tab and its items
         self.form_tab = QtGui.QWidget()
         self.form_layout = QtGui.QFormLayout()
         self.form_button = QtGui.QPushButton('Save', self.form_tab)
         self.form_warning = QtGui.QLabel('', self.form_tab)
         self.form_boxes = {}
+
+        # initialize view tab and its items
         self.view_tab = QtGui.QWidget()
         self.view_table = QtGui.QTableWidget(self.view_tab)
         self.set_form_tab()
         self.set_view_tab()
+
+        # initialize process tab and its items
+        self.process_tab = QtGui.QWidget()
+        self.process_layout = QtGui.QVBoxLayout()
+        self.process_btn = QtGui.QPushButton('Recognize Plate')
+        self.process_label = QtGui.QLabel()
+        self.fopen_btn = QtGui.QPushButton('Open File')
+        self.file_dialog = QtGui.QFileDialog()
+        self.process_content = QtGui.QTextEdit()
+        self.plate_img_path = ''
+        self.set_process_tab()
 
     def set_form_tab(self):
         """sets input form which would be used to
@@ -42,6 +59,57 @@ class AppWin(object):
                 self.form_btn_click)
         self.form_tab.setLayout(self.form_layout)
         self.tabs.addTab(self.form_tab, "New Car")
+
+    def set_process_tab(self):
+        """sets image processing tab. image would be chosen by document
+        window, then openalpr would be run
+        """
+        self.process_layout.addWidget(self.process_label)
+        self.process_layout.addWidget(self.process_btn)
+        self.process_layout.addWidget(self.fopen_btn)
+        self.process_content.setMaximumSize(625, 50)
+        self.process_content.setReadOnly(True)
+        self.process_layout.addWidget(self.process_content)
+        self.process_tab.setLayout(self.process_layout)
+        self.fopen_btn.clicked.connect(self.getfile)
+        self.process_btn.clicked.connect(self.read_plate)
+        self.tabs.addTab(self.process_tab, "Process Cars")
+
+    def getfile(self):
+        """ opens file browser and pixmap. on process button click,
+        trigs plate reading.
+        """
+        fname = self.file_dialog.getOpenFileName(None, 'Open File',
+                '/', 'Image Files (*.jpg *.png)')
+        self.plate_img_path = str(fname)
+        pixmap = QtGui.QPixmap(fname)
+        pixmap = pixmap.scaled(625, 500)
+        self.process_label.setPixmap(pixmap)
+
+    def read_plate(self):
+        plate = PlateRead(self.plate_img_path)
+        self.process_content.setText('')
+        succ_str = 'name: {name}, surname: {surname}, plate: {plate}'
+        status, result = plate.plate_check()
+        print status
+        print result
+        if status:
+            name = result[0]['name']
+            surname = result[0]['surname']
+            plate = result[0]['plate']
+            succ_str = succ_str.format(name=name,
+                    surname=surname, plate=plate)
+            self.process_content.insertPlainText('Citizen\n')
+            self.process_content.insertPlainText(succ_str)
+        else:
+            if str(result['plate']) == 'NoN':
+                self.process_content.insertPlainText('Read Failed')
+            else:
+                self.process_content.insertPlainText('Not in Garage\n')
+                self.process_content.insertPlainText('Plate:'
+                    + ' ' + result['plate'] + '\n')
+                self.process_content.insertPlainText('Conf: '
+                    + ' ' + result['conf'])
 
     def form_btn_click(self):
         """checks textboxes of form, if name, surname, door and
@@ -121,17 +189,16 @@ class AppWin(object):
         viewer = CarRecorder(name=None, surname=None, phone=None,
                 email=None, plate=None, door=None, db_name=db_name)
         car_info = viewer.get_table_info(CAR_TABLE)
+        print car_info
         columns = conf.get_table_fields(CAR_TABLE)
         self.view_table.setColumnCount(len(columns))
         self.view_table.setRowCount(len(car_info))
         col_str = ','.join(columns)
-        print col_str
         self.view_table.setHorizontalHeaderLabels \
             (QtCore.QString(col_str).split(','))
-        self.view_table.resize(600, 500)
+        self.view_table.resize(700, 600)
         self.tabs.addTab(self.view_tab, "View Cars")
         for i in range(0, len(car_info)):
-            print i
             for idx, val in enumerate(columns):
                 self.view_table.setItem(i, idx, QtGui.QTableWidgetItem(
                     car_info[i][val]))

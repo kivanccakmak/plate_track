@@ -62,6 +62,24 @@ class CarRecorder(object):
         rows = self._cursor.fetchall()
         return rows
 
+    def get_plate_records(self, plate, table_name):
+        """Checks whether plate exist in database
+        or not
+        :plate: string
+            plate number of car
+        :table_name: string
+            car information table in database
+        :returns: dict
+            car relevant information in database
+        """
+        query = 'SELECT * FROM [{tbl}] WHERE' + ' ' +\
+                '"plate"="{str}"'
+        query = query.format(tbl=table_name, str=plate)
+        self._cursor.execute(query)
+        rows = self._cursor.fetchall()
+        return rows
+
+
 
 
 
