@@ -1,8 +1,8 @@
 #plate-track
 ------------
-Ultimate goal is construct software for automatic garage door, 
-which would use alive camera to recognize cars and ardunio to
-open door.
+Ultimate goal is constructing a software for autonomous garage door 
+which would use alive camera to recognize entering car and ardunio to
+open the door.
 
 Currently, offline plate recording is done. 
 
