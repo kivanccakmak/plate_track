@@ -11,7 +11,7 @@ Currently, offline plate recording is done.
 <br>
 **_pyqt_** used to introduce user interface
 <br>
-**_openalpr_** is used to recognize cars
+**_openalpr_** is used to recognize car plates
 
 
 ##Dependencies
