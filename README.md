@@ -31,7 +31,10 @@ python initializer.py
 python ui.py
 ```
 
-![Record Car](img/record.png)
+![Not in Garage](img/not_in_garage = 200x100)
+![Record Car](img/record_car.png = 200x100)
+![View Cars](img/view_cars.png = 200x100)
+![In Garage](img/in_garage.png = 200x100)
 
 ##Beneficial
 
