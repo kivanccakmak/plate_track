@@ -43,6 +43,8 @@ python ui.py
 sudo apt-get install sqliteman
 ```
 
+##Screenshots
+
 ![](img/not_in_garage.png)
 ![](img/record.png)
 ![](img/view_cars.png)
