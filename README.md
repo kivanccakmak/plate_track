@@ -37,7 +37,7 @@ sudo apt-get install sqliteman
 ```
 
 ![](img/not_in_garage.png)
-![](img/record_car.png)
+![](img/record.png)
 ![](img/view_cars.png)
 ![](img/in_garage.png)
 
