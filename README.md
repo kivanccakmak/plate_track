@@ -31,6 +31,8 @@ python initializer.py
 python ui.py
 ```
 
+![Record Car](img/record.png)
+
 ##Beneficial
 
 ```
