@@ -31,10 +31,10 @@ python initializer.py
 python ui.py
 ```
 
-![Not](img/not_in_garage.png)
-![Record](img/record_car.png)
-![View](img/view_cars.png)
-![In](img/in_garage.png)
+![](img/not_in_garage.png)
+![](img/record_car.png)
+![](img/view_cars.png)
+![](img/in_garage.png)
 
 ##Beneficial
 
