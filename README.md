@@ -30,17 +30,18 @@ sudo apt-get install python-qt4
 python initializer.py
 python ui.py
 ```
+##Beneficial
+
+```
+sudo apt-get install sqliteman
+```
 
 ![](img/not_in_garage.png)
 ![](img/record_car.png)
 ![](img/view_cars.png)
 ![](img/in_garage.png)
 
-##Beneficial
 
-```
-sudo apt-get install sqliteman
-```
 
 
 
