@@ -13,6 +13,13 @@ Currently, offline plate recording is done.
 <br>
 **_openalpr_** is used to recognize car plates
 
+OpenAlpr's python inteface was extremely slow in my PC, for this reason
+I used system call approach and parsed stdout in *plate_reader.py* as following:
+
+```
+cmd = 'alpr -c eu picture.png'
+proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+```
 
 ##Dependencies
 
