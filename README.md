@@ -34,7 +34,7 @@ sudo apt-get install python-qt4
 ##Usage
 
 ```
-python initializer.py
+sudo ./install.sh
 python ui.py
 ```
 ##Beneficial

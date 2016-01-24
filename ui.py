@@ -10,7 +10,7 @@ import sys
 import os
 import ast
 
-CONFIG_FILE = 'config.ini'
+CONFIG_FILE = 'src/config.ini'
 CAR_TABLE = 'car_info'
 
 class AppWin(object):
