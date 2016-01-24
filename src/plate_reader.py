@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from car_recorder import CarRecorder
 from fconfig import Fconfig
 
@@ -8,7 +9,6 @@ ALPR_INDEX['confidence'] = -1
 
 FILE_PATH = '/home/kivi/Downloads/plaka.jpg'
 CMD = 'alpr -c eu {plate_img}'
-CONFIG_FILE = 'config.ini'
 
 class PlateRead(object):
 
@@ -16,10 +16,16 @@ class PlateRead(object):
     file and returns plate with confidence
     level"""
 
-    def __init__(self, file_path):
-        """Initializer function """
-        self.file_path = file_path
+    def __init__(self, img_path, conf_path):
+        """Initializer function
+        :img_path: str
+            path of image to process
+        :conf_path: str
+            path to config file
+        """
+        self.img_path = img_path
         self.result = []
+        self.conf = Fconfig(conf_path)
 
     def openalpr_run(self):
         """runs openalpr and returns results in array.
@@ -29,7 +35,7 @@ class PlateRead(object):
         """
         plate = ''
         confidence = ''
-        alpr_cmd = CMD.format(plate_img=self.file_path)
+        alpr_cmd = CMD.format(plate_img=self.img_path)
         proc = subprocess.Popen([alpr_cmd], \
                 stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
@@ -44,6 +50,10 @@ class PlateRead(object):
         return self.result
 
     def plate_check(self):
+        """
+        returns: bool
+        returns: dict
+        """
         result = self.openalpr_run()
         print result
         result_info = {}
@@ -56,7 +66,7 @@ class PlateRead(object):
         for val in result:
             state, plate = PlateRead.tr_plate_check(str(val['plate']))
             if state:
-                rows = PlateRead.db_check(plate)
+                rows = self.db_check(plate)
             else:
                 rows = []
             if len(rows) != 0:
@@ -108,15 +118,22 @@ class PlateRead(object):
                     return False, ''
         return True, ''.join(plate)
 
-    @staticmethod
-    def db_check(plate):
+    def db_check(self, plate):
         """ checks database to seek plate.
         :plate: string
             plate number
         """
-        conf = Fconfig(CONFIG_FILE)
-        db_name = conf.get_db_name()
+        print "in db_check()"
+        db_name = ''
+        try:
+            db_name = self.conf.get_db_name()
+            print "db_name: {}".format(db_name)
+        except:
+            print "config parser errror"
+            print "plate: {}".format(plate)
+            print "db_name: {}".format(db_name)
         records = CarRecorder({}, db_name)
+        print records
         rows = records.get_plate_records(plate, 'car_info')
         return rows
 
