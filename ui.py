@@ -1,3 +1,7 @@
+#!/usr/bin/python
+"""
+AppModule, interacts with user
+"""
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4.QtCore import pyqtSlot

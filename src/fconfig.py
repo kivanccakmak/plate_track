@@ -1,3 +1,7 @@
+#!/usr/bin/python
+"""
+Config getter module
+"""
 import ConfigParser
 import collections
 import ast

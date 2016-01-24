@@ -1,9 +1,12 @@
+#!/usr/bin/python
+"""
+Searching and Manipulating
+SQL Database
+"""
 import sqlite3
 import ConfigParser
 import collections
 from query import Query
-
-CONFIG_FILE = "config.ini"
 
 class CarRecorder(object):
 

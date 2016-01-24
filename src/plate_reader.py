@@ -1,3 +1,8 @@
+#!/usr/bin/python
+"""
+OpenAlpr Using and DataBase Connecting
+Module
+"""
 import subprocess
 import sys
 from car_recorder import CarRecorder
@@ -64,7 +69,6 @@ class PlateRead(object):
             result_info['plate'] = 'NoN'
             return False, result_info
 
-        result_info = {}
         for val in result:
             state, plate = PlateRead.tr_plate_check(str(val['plate']))
             if state:

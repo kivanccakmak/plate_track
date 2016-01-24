@@ -1,3 +1,7 @@
+#!/usr/bin/python
+"""
+Database functions check module
+"""
 from car_recorder import CarRecorder
 from fconfig import Fconfig
 

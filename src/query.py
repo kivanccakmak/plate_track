@@ -1,3 +1,7 @@
+#!/usr/bin/python
+"""
+SQL Query generating module
+"""
 class Query:
 
     """returns sql queries to manipulate tables."""
