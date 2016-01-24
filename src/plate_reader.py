@@ -18,7 +18,8 @@ class PlateRead(object):
         :img_path: str
             path of image to process
         :conf_path: str
-            path to config file
+            path to config file which contains
+            hard-coded parts
         """
         self.img_path = img_path
         self.result = []
@@ -26,7 +27,8 @@ class PlateRead(object):
 
     def openalpr_run(self):
         """runs openalpr and returns results in array.
-        :file_path: file path to read
+        :file_path: str
+            file path to read
         :returns: array
             [[plate, confidence], [], ...]
         """
@@ -51,7 +53,9 @@ class PlateRead(object):
     def plate_check(self):
         """
         returns: bool
-        returns: dict
+            whether plate exist in database
+        returns: arr
+            openalr estimates
         """
         result = self.openalpr_run()
         result_info = {}
@@ -78,9 +82,10 @@ class PlateRead(object):
         """Turkey's plate number in format of.
         int(2 char) string(varies) int(varies)
         :plate: string
-        :returns: bool and string
-            bool -> whether plate is valid for Turkey
-            string -> fixed plate number
+        :returns: bool
+            whether plate is valid for Turkey
+        :returns: str
+            fixed plate number
         """
         plate = list(plate)
         if str(plate[0]) == 'O':
@@ -118,10 +123,9 @@ class PlateRead(object):
 
     def db_check(self, plate):
         """ checks database to seek plate.
-        :plate: string
+        :plate: str
             plate number
         """
-        print "in db_check()"
         db_name = ''
         db_name = self.conf.get_db_name()
         records = CarRecorder({}, db_name)

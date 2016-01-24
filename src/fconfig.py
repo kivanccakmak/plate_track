@@ -3,9 +3,8 @@ import collections
 import ast
 
 def parse_dict(str_val):
-    """Parses dict string from .ini file.
-
-    :str_val: string
+    """Parses dict str from .ini file.
+    :str_val: str
         '{'key1':'val1'}\n{'key2':'val2'}'
     :returns: dictionary
         {'key1':'val1', 'key2':'val2'}
@@ -21,11 +20,11 @@ def parse_dict(str_val):
     return elem_list
 
 def parse_dict_arr(str_val):
-    """Parses dict array string from .ini file.
-
-    :str_val: string
+    """Parses dict array str from .ini file.
+    :str_val: str
         '{'key1':'val1'}\n{'key2':'val2'}'
-    :returns: dictionary array
+    :returns: arr
+        contains dictionaries as follows
         [{'key1':'val1'}, {'key2':'val2'}]
     """
     elem_arr = []
@@ -36,18 +35,18 @@ def parse_dict_arr(str_val):
 
 class Fconfig(object):
 
-    """Docstring for Fconfig. """
+    """Hard Coded Configuration Parser. """
 
     def __init__(self, fname):
         """initiate config file
-        :fname: string
+        :fname: str
             file name of config file
         """
         self._fname = fname
 
     def get_config(self, section_name):
         """Gets configuration from given section in config.ini.
-        :section_name: string
+        :section_name: str
             Name of the section
         :returns: dict
         """
@@ -62,8 +61,9 @@ class Fconfig(object):
 
     def get_table_fields(self, table):
         """get field list of table
-        :table: string
-        :returns: string array
+        :table: str
+        :returns: arr
+            contains strings
         """
         field_map = self.get_config('field_map')[table]
         field_map = field_map.split(',')
@@ -73,7 +73,7 @@ class Fconfig(object):
 
     def get_db_name(self):
         """get relative path of database
-        :returns: string
+        :returns: str
         """
         db_info = self.get_config('database')
         db_name = db_info['name']

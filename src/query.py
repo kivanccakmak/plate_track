@@ -5,11 +5,11 @@ class Query:
     @staticmethod
     def get_create_qry(tbl_name, fields):
         """returns table create query.
-        :tbl_name: string
+        :tbl_name: str
             table to be created into db
-        :fields: string array
+        :fields: str array
             fields in table
-        :returns: string
+        :returns: str
             create query
         """
         query = 'CREATE TABLE [{tbl}] {fields}'
@@ -27,13 +27,13 @@ class Query:
     @staticmethod
     def get_add_qry(info, table_name):
         """returns sql insert query.
-        :table_name: string
+        :table_name: str
         :info: dict
-            keywords(string) are columns
-            values(string) are values
+            keywords(str) are columns
+            values(str) are values
             to be inserted into tables
             info = {'col1': 'val1', 'col2': 'val2'}
-        :returns: string
+        :returns: str
             insert query
         """
         query = ''
@@ -58,8 +58,8 @@ class Query:
         """returns sql delete query with respect.
         assumes that info dict contains single key
         :info: dict
-        :table_name: string
-        :returns: string
+        :table_name: str
+        :returns: str
         """
         key = info.keys()[0]
         val = info[key]

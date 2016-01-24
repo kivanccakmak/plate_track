@@ -25,7 +25,7 @@ class CarRecorder(object):
 
     def add_car(self, table_name):
         """Record car information into database.
-        :table_name: string
+        :table_name: str
         """
         query = Query.get_add_qry(self.info, table_name)
         print query
@@ -33,8 +33,9 @@ class CarRecorder(object):
         self._conn.commit()
 
     def del_car(self, table_name):
-        """Deletes car entry from database by using plate.
-        :table_name: string
+        """Deletes car entry from database
+        by using plate.
+        :table_name: str
         """
         info = {'plate':self.info['plate']} # hard-coded
         query = Query.get_delete_qry(info, table_name)
@@ -44,7 +45,7 @@ class CarRecorder(object):
 
     def get_table_info(self, table_name):
         """returns table info in raw factory.
-        :table_name: string
+        :table_name: str
         :returns: sqlite3.Row object
             contains array of dict which represents
             all entries in table
@@ -58,9 +59,9 @@ class CarRecorder(object):
     def get_plate_records(self, plate, table_name):
         """Checks whether plate exist in database
         or not
-        :plate: string
+        :plate: str
             plate number of car
-        :table_name: string
+        :table_name: str
             car information table in database
         :returns: dict
             car relevant information in database
