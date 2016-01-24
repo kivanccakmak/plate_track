@@ -1,11 +1,11 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4.QtCore import pyqtSlot
-from car_recorder import CarRecorder
-from fconfig import Fconfig
-from fconfig import parse_dict 
-from fconfig import parse_dict_arr
-from plate_reader import PlateRead
+from src.car_recorder import CarRecorder
+from src.fconfig import Fconfig
+from src.fconfig import parse_dict 
+from src.fconfig import parse_dict_arr
+from src.plate_reader import PlateRead
 import sys
 import os
 import ast
