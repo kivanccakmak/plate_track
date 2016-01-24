@@ -10,59 +10,6 @@ FILE_PATH = '/home/kivi/Downloads/plaka.jpg'
 CMD = 'alpr -c eu {plate_img}'
 CONFIG_FILE = 'config.ini'
 
-def tr_plate_check(plate):
-    """Turkey's plate number in format of.
-    int(2 char) string(varies) int(varies)
-    :plate: string
-    :returns: bool and string
-        bool -> whether plate is valid for Turkey
-        string -> fixed plate number
-    """
-    plate = list(plate)
-    if str(plate[0]) == 'O':
-        plate[0] = '0'
-    if str(plate[1]) == 'O':
-        plate[1] = '0'
-    try:
-        val = int(plate[0])
-    except ValueError:
-        return False, ''
-    try:
-        val = int(plate[1])
-    except ValueError:
-        return False, ''
-
-    i = 2
-    str_end = -1
-    while i < len(plate) and str_end == -1:
-        try:
-            val = int(str(plate[i]))
-            str_end = i
-        except ValueError:
-            pass
-        i += 1
-
-    for i in range(str_end, len(plate)):
-        if plate[i] == 'O':
-            plate[i] = '0'
-        else:
-            try:
-                val = int(plate[i])
-            except ValueError:
-                return False, ''
-    return True, ''.join(plate)
-
-def db_check(plate):
-    """ checks database to seek plate.
-    :plate: string
-        plate number
-    """
-    conf = Fconfig(CONFIG_FILE)
-    db_name = conf.get_db_name()
-    records = CarRecorder({}, db_name)
-    rows = records.get_plate_records(plate, 'car_info')
-    return rows
-
 class PlateRead(object):
 
     """Plate Reader Class. Process image
@@ -107,9 +54,9 @@ class PlateRead(object):
 
         result_info = {}
         for val in result:
-            state, plate = tr_plate_check(str(val['plate']))
+            state, plate = PlateRead.tr_plate_check(str(val['plate']))
             if state:
-                rows = db_check(plate)
+                rows = PlateRead.db_check(plate)
             else:
                 rows = []
             if len(rows) != 0:
@@ -117,6 +64,61 @@ class PlateRead(object):
                 return True, result_info
         result_info = result[0]
         return False, result_info
+
+    @staticmethod
+    def tr_plate_check(plate):
+        """Turkey's plate number in format of.
+        int(2 char) string(varies) int(varies)
+        :plate: string
+        :returns: bool and string
+            bool -> whether plate is valid for Turkey
+            string -> fixed plate number
+        """
+        plate = list(plate)
+        if str(plate[0]) == 'O':
+            plate[0] = '0'
+        if str(plate[1]) == 'O':
+            plate[1] = '0'
+        try:
+            val = int(plate[0])
+        except ValueError:
+            return False, ''
+        try:
+            val = int(plate[1])
+        except ValueError:
+            return False, ''
+
+        i = 2
+        str_end = -1
+        while i < len(plate) and str_end == -1:
+            try:
+                val = int(str(plate[i]))
+                str_end = i
+            except ValueError:
+                pass
+            i += 1
+
+        for i in range(str_end, len(plate)):
+            if plate[i] == 'O':
+                plate[i] = '0'
+            else:
+                try:
+                    val = int(plate[i])
+                except ValueError:
+                    return False, ''
+        return True, ''.join(plate)
+
+    @staticmethod
+    def db_check(plate):
+        """ checks database to seek plate.
+        :plate: string
+            plate number
+        """
+        conf = Fconfig(CONFIG_FILE)
+        db_name = conf.get_db_name()
+        records = CarRecorder({}, db_name)
+        rows = records.get_plate_records(plate, 'car_info')
+        return rows
 
 def main():
     """runs open alpr with system call,
