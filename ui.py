@@ -113,7 +113,6 @@ class AppWin(object):
         plate = PlateRead(self.plate_img_path, CONFIG_FILE)
         self.process_content.setText('')
         status, result = plate.plate_check()
-        print "result: {}".format(result)
         if status:
             self.process_content.setStyleSheet("QTextEdit {color:green}")
             self.print_dict_res(result)

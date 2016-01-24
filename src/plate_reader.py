@@ -7,9 +7,6 @@ ALPR_INDEX = {}
 ALPR_INDEX['plate'] = 1
 ALPR_INDEX['confidence'] = -1
 
-FILE_PATH = '/home/kivi/Downloads/plaka.jpg'
-CMD = 'alpr -c eu {plate_img}'
-
 class PlateRead(object):
 
     """Plate Reader Class. Process image
@@ -35,7 +32,9 @@ class PlateRead(object):
         """
         plate = ''
         confidence = ''
-        alpr_cmd = CMD.format(plate_img=self.img_path)
+        alpr_cmd = self.conf.get_config('CMD')['run']
+        alpr_cmd = alpr_cmd.format(plate_img=self.img_path)
+        print alpr_cmd
         proc = subprocess.Popen([alpr_cmd], \
                 stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
@@ -55,7 +54,6 @@ class PlateRead(object):
         returns: dict
         """
         result = self.openalpr_run()
-        print result
         result_info = {}
         if len(result) == 0:
             result_info['conf'] = '0'
@@ -125,22 +123,20 @@ class PlateRead(object):
         """
         print "in db_check()"
         db_name = ''
-        try:
-            db_name = self.conf.get_db_name()
-            print "db_name: {}".format(db_name)
-        except:
-            print "config parser errror"
-            print "plate: {}".format(plate)
-            print "db_name: {}".format(db_name)
+        db_name = self.conf.get_db_name()
         records = CarRecorder({}, db_name)
-        print records
         rows = records.get_plate_records(plate, 'car_info')
         return rows
 
 def main():
     """runs open alpr with system call,
     prints output."""
-    reader = PlateRead(FILE_PATH)
+    img_path = '/home/kivi/Downloads/plaka.jpg'
+    conf_path = 'config.ini'
+    conf = Fconfig(conf_path)
+    alpr_cmd = conf.get_config('CMD')['run']
+    alpr_cmd = alpr_cmd.format(plate_img=img_path)
+    reader = PlateRead(img_path, conf_path)
     result = reader.openalpr_run()
     print result
 
