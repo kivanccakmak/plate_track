@@ -4,16 +4,16 @@ Initialize script to construct
 tables in database
 """
 import sqlite3
-from query import Query
-from fconfig import Fconfig
+from src.query import Query
+from src.fconfig import Fconfig
+import sys
 
-def main():
+def main(db_name):
     """creates database with tables
     """
-    db_name = '../data/garage.sqlite'
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    conf = Fconfig('config.ini')
+    conf = Fconfig('src/config.ini')
     table_list = conf.get_config('tables')['name'].split()
     for table in table_list:
         fields = conf.get_table_fields(table)
@@ -22,7 +22,11 @@ def main():
     conn.close()
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print "illegal usage"
+        print "{} db_name"
+        sys.exit()
+    main(sys.argv[1])
 
 
 

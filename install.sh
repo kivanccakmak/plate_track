@@ -3,5 +3,5 @@
  sudo apt-get update
  sudo apt-get install openalpr openalpr-daemon openalpr-utils libopenalpr-dev
  sudo apt-get install python-qt4
- python src/initializer.py
+ python initializer.py data/garage.sqlite
 
